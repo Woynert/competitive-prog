@@ -1,0 +1,23 @@
+4
+6 6
+aBBBcB
+5 1
+AAAAA
+1 0
+a
+6 2
+BaEDAb
+
+
+6 2
+aAaabb
+11 2
+aAaaBACacbE
+2 2
+ab
+4 1
+aaBB
+6 0
+abBAcC
+5 3
+cbccb

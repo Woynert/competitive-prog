@@ -1,0 +1,4 @@
+3
+fuzzy any 10
+wool left 6
+wool right 4
