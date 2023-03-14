@@ -1,8 +1,13 @@
-#include<bits/stdc++.h>
-#include <list>
-#include <iterator>
+#include <bits/stdc++.h>
 using namespace std;
-#include <iostream>
+
+#define fi first
+#define se second
+#define pb push_back
+#define PII pair<int, int>
+#define int unsigned long long
+#define all(x) x.begin, x.end
+#define mem(a, b) memset(a, b, sizeof a)
 
 // debug util
 #ifdef DEBUG
@@ -11,113 +16,101 @@ using namespace std;
     #define deb(x)
 #endif
 
-// useful
-#define ll long long
-#define umap unordered_map
-bool multi = false;
+const int INF = 1e13 + 5;
+const int N = 1e6 + 5;
+int n;
+int a[N];
 
-void solve(){
-	int n, cn, mind = -1, minn; cin >> n;
-	list<int> cl;
-	int ds[n]; 
-	
-	for(int i=0; i<n; i++){
-		cin >> cn; 
-		cl.push_back(cn);
-	}
+// mid: The current mid point of the binary search
+// To check if the value works as tolerance level.
+bool check(int mid){
+  // The pair stores: {spiciness, plus value}
+  vector<PII> v;
+  int tol = mid;
 
-	// 1. fill the distances arr
-	list<int>::iterator bit, ait, startPnt, it = cl.begin(); 
-	int db, da, index = 0; 
-	
-	while(it != cl.end()){
-		// Find the distances to the next and before elemnet
-		bit = ait = it; 
-		it == --cl.end() ? ait = cl.begin() : ++ait; 
-		it == cl.begin() ? bit = --cl.end() : --bit;
-		db = abs(*it - *bit);
-		da = abs(*it - *ait);
-		
-		// Take the min one
-		ds[index] = min(db, da);  
-		
-		// If the globals were not initialized yet
-		if(mind == -1){
-			mind = ds[index]; 
-			minn = *it; 
-			startPnt = it; 
-		}
-		// If an equal distance was foumd
-		else if(ds[index] == mind){
-			if(minn > *it){
-				startPnt = it; 
-				minn = *it; 
-			} 
-		}
-		// If a new min distance was found
-		else if(ds[index] < mind){
-			mind = ds[index]; 
-			minn = *it; 
-			startPnt = it; 
-		}
-		
-		// Iterate
-		index++; 
-		it++; 
-	}
-	
-	// deb(mind); 
-	// deb(minn); 
+  // Check the entire array
+  for(int i=1; i <= n; i++){
+    deb(a[i]);
 
-	// 2. Eat
-	int clvl = minn * 2;
-	int minlvl = minn;  
-	int needs = 0; 
-	
-	it = startPnt; // Initialize the current iterator
-	
-	while(cl.size() != 1){
-		// Find the lowest distance to the ngbrs
-		bit = it; 
-		ait = it; 
-		it == --cl.end() ? ait = cl.begin() : ++ait; 
-		it == cl.begin() ? bit = --cl.end() : --bit;
-		
-		deb(*bit);
-		deb(*it);
-		deb(*ait);
-		
-		int d1 = clvl - *bit; 
-		int d2 = clvl - *ait;
-		
-		deb(clvl);  
-		deb(d1);
-		deb(d2); 
-		
-		if(d1 > d2){
-			// Go to the left
-			needs = clvl >= *bit ? 0 : abs(d1); 
-			clvl += *bit; 
-			cl.erase(bit); 
-		}else{
-			// Go to the right
-			needs = clvl >= *ait ? 0 : abs(d2);
-			clvl += *ait; 
-			cl.erase(ait); 
-		}		
-		
-		deb(needs); 
-		minlvl += needs;
-		clvl += needs; 
-	}
-	
-	cout << minlvl << endl; 
+    if(a[i] <= tol){
+      // IF [CAN EAT]
+      // cout << "CAN EAT" << endl;
+
+      // Add the spiciness of the pizza to the
+      // current tolerance
+      tol += a[i];
+      deb(tol);
+
+      while(v.size() && v.back().fi <= tol){
+        deb(v.back().fi);
+        deb(v.back().se);
+        // cout << "EATING..." << endl;
+        // Try to eat the next pizza slice
+        tol += v.back().se;
+        deb(tol);
+        // Remove the pizza slice from the vector of pairs
+        v.pop_back();
+      }
+    }else{
+      // IF [CANNOT EAT]
+      // cout << "CANNOT EAT" << endl;
+
+      v.pb({a[i], tol - mid + a[i]});
+      tol = mid;
+    }
+  }
+
+  return !v.size();
 }
 
-int main(){
-    ios::sync_with_stdio(false);cin.tie(0);cout.tie(0);
-    int t=1;
-    if(multi)cin>>t;
-    while(t--)solve();
-    return 0;
+signed main(){
+  // Receive the number of pizza slices
+  cin >> n;
+
+  for(int i=1; i <= n; i++){
+    // This creates a circular list:
+    // eg. [null, 10, 20, 15, 1, 10, 20, 15, 1]
+    // For some reason, this person doesn't use the
+    // index 0 as the first position of the array.
+    cin >> a[i], a[i + n] = a[i];
+  }
+
+
+  // This is equivalent to n *= 2;
+  n <<= 1;
+
+
+  // Use binary search to find the initial tolerance
+  // Initially, the left index is the begining of the array
+  // and the right index is the lenfth of the array.
+  int l = 0, r = INF;
+
+  // This while loop is to check multiple tolerances until found
+  // the lessest one that works
+  while(l < r){
+    // Find the mid point (as in every binary search algorithm)
+    // r >> 1 is equivalent to floor(r / 2);
+    int mid = l + r >> 1;
+    deb(mid);
+
+    if(check(mid)){
+      // If the tolerance works, move the right index to the mid of the
+      // array (FIND A LESSER VALUE).
+      // cout << mid << " works" << endl;
+      r = mid;
+    }
+    else {
+      // If the tolerance doesn't works, move the left index to the mid
+      // of the array. (FIND A HIGHTER VALUE)
+      // cout << mid << " doesn't works" << endl;
+      l = mid + 1;
+    }
+  }
+
+  // They converge
+  //deb(l);
+  //deb(r);
+
+  // Finally, print the lessest tolerance that works.
+  cout << l << endl;
 }
