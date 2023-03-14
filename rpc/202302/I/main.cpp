@@ -30,9 +30,9 @@ void solve(){
     }
 
     // check each paur until there is no more positive numbers
-    while(true){
+    //while(true){
 
-        multiset<vector<int>> ts;
+        multiset<vector<long double>> ts;
         bool finished = true;
 
         // save time to temporary list
@@ -47,55 +47,83 @@ void solve(){
             }
             i = j;
             j = *it;
-            int time = 0;
+            long double time = 0;
 
-            deb(i);
-            deb(j);
-            deb(time);
 
             // different speed
             if (dro[i][1] == dro[j][1])
                 continue;
 
-            time = ceil((float)(dro[i][0] - dro[j][0]) / (dro[j][1] - dro[i][1]));
+            time = ((long double)(dro[i][0] - dro[j][0])) / (dro[j][1] - dro[i][1]);
             if (time <= 0) continue;
             finished = false;
 
-            ts.insert({time, i, j});
+            ts.insert({time, (long double)i, (long double)j});
             i = *it;
         }
 
+		bool potentialCol = true;
+		
+		//while (potentialCol){
+			//potentialCol = false;
+			deb(1);
+			// iterate each item in the list
+			for (multiset<vector<long double>>::iterator it = ts.begin(); it != ts.end(); it++)
+			{
+				vector<long double> v = *it;
+				deb("collision");
+				int v1 = (int)v[1];
+				int v2 = (int)v[2];
+				deb(v[0]);
+				deb(v[1]);
+				deb(v[2]);
 
-        // iterate each item in the list
-        for (multiset<vector<int>>::iterator it = ts.begin(); it != ts.end(); it++)
-        {
-            vector<int> v = *it;
-            deb("collision");
-            deb(v[0]);
-            deb(v[1]);
-            deb(v[2]);
+				// check they still exists
 
-            // check they still exists
+				if (!(dro[v1][2] && dro[v2][2])){
+					finished = false;
+					continue;
+				}
+				
+				// only bigger than 0
+				if (v[0] <= 0)
+					continue;
 
-            if (!(dro[v[1]][2] && dro[v[2]][2]))
-                continue;
-            
-            // only bigger than 0
-            if (v[0] <= 0)
-                continue;
+				dro[v1][2] = 0;
+				dro[v2][2] = 0;
 
-            dro[v[1]][2] = 0;
-            dro[v[2]][2] = 0;
+				// remove from list
+				ld.remove(v1);
+				ld.remove(v2);
+				deb("removed");
+				
+				// calculate time for new adjacente nodes
+				v1--;
+				v2++;
+				if ((v1 >= 0) && (v2 < n)){
+					it = ts.begin();
+					
+					// different speed
+					if (dro[v1][1] == dro[v2][1])
+						continue;
 
-            // remove from list
-            ld.remove(v[1]);
-            ld.remove(v[2]);
+					long double time = ((long double)(dro[v1][0] - dro[v2][0])) / (dro[v2][1] - dro[v1][1]);
+					if (time <= 0) continue;
+					//finished = false;
 
-            deb("removed");
-        }
+					ts.insert({time, (long double)v1, (long double)v2});
+					//potentialCol = true;
+					
+					
+					//break;
+				}
+				
 
-        if (finished) break;
-    }
+			}
+		//}
+
+        //if (finished) break;
+    //}
 
     // print solution
     cout << ld.size() << endl;

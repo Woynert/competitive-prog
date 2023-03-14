@@ -23,6 +23,9 @@ void solve(){
     // Receive each group
     while(n--){
         cin >> type >> fit >> k;
+        
+        // Socks types counter
+        if(socks.find(type) == socks.end()) tsocks++; 
 
         if(fit == "any"){
             socks[type][2] = k;
@@ -34,11 +37,10 @@ void solve(){
     }
 
     // Iterate each key and find the worst case
-    int gmin = -1;
     map<string, array<int, 3>>::iterator it = socks.begin();
-
-    int worst = 0;
-
+    int global_worst = 0; 
+    int impossible_count = 0; 
+    
     while(it != socks.end()){
         int left, right, any;
         string key = it -> first;
@@ -48,34 +50,20 @@ void solve(){
 
         int limited_any = min(1, any);
         int lr_max = max(left, right);
-        worst += max(limited_any, lr_max);
-
-        // Continue iterating
-        it++;
-    }
-    
-    it = socks.begin();
-
-    while(it != socks.end()){
-        int left, right, any, lmax;
-        string key = it->first;
-        left = it->second[0];
-        right = it->second[1];
-        any = it->second[2];
-
-        // deb(key);
-        int limited_any = min(1, any);
-        int lr_max = max(left, right);
-        int lworst = max(limited_any, lr_max);
-        // deb(lworst);
-
-        gmin == -1 ? gmin = worst - lworst : gmin = max(gmin, worst - lworst);
-        it++;
-
-        // 🏳️
-    }
-
-    cout << gmin << endl;
+        int local_worst = max(limited_any, lr_max); // Local worst case
+        global_worst += local_worst;  // Increment the global worst
+        
+        if((any <= 1) && (left == 0 || right == 0)) impossible_count++; 
+		it++; 
+	}
+	
+	
+	impossible_count == tsocks ? cout << "impossible" : cout << global_worst + 1; 
+	cout << endl; 
+	
+	// deb(tsocks); 
+	// deb(global_worst); 
+	// cout << global_worst << endl; 
 }
 
 int main(){
