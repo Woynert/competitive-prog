@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include <iomanip>
 using namespace std;
 
 // debug util
@@ -16,81 +17,67 @@ bool multi = false;
 void solve(){
 	int n;
 	cin >> n;
-	
-	bool first = true;
-	bool vis[720] = {};
-	
-	int i, j, bk;
-	
-	// get input
-	while(n--){
-		cin >> j >> j;
-		j += 360;
-		j %= 360;
-		//j += 360;
+
+	bool vis[720+1000] = {};
+
+	int first, from, to;
+	int start, end, bk;
+	cin >> from >> from;
+	first = from;
+
+	for (int i = 0; i < n; i++){
 		
-		if (first){
-			i = j;
-			
-			first = false;
-			continue;
-		}
-		
-		
-		// get min and max
-		if ((i) > (j)){
-			bk = i;
-			i = j;
-			j = bk;
-		}
-		
-		int from, to;
-		
-		// 
-		if ((j - i) < (360-j+i)){
+		if (i < n-1)
+			cin >> to >> to;
+		// travel from the last to the first
+		else
+			to = first;
+
+		// make [start] the smaller and [end] the bigger
+		if (to > from){
+			start = from;
+			end = to;
 		}
 		else{
-			bk = i;
-			i = j;
-			j = bk;
+			start = to;
+			end = from;
 		}
-		
-		deb(i);
-		deb(j);
-		
-		// fill visited
-		cout << i << " " << j << " " << endl;
-		for (int f = i; f <= j; f++){
-			int s = i + (f-i);
-			vis[(s % 360)*2] = true;
-			
-			cout << (s % 360)*2 << " ";
-			if (f != j){
-				vis[(s % 360)*2+1] = true;
-				cout << (s % 360)*2+1 << " ";
-			}
+
+		// get shortest route. Range [-180, 179]
+		if (abs(start - end) > (360 - abs(start - end))){
+			bk = start;
+			start = end;
+			end = bk;
 		}
-		
-		cout << endl;
-		
-		i = j;
+
+		deb(start);
+		deb(end);
+
+		// fill range as true (visited)
+		int j = start;
+		while(true){
+			vis[1000 + j*2] = true;
+			if (j != end)
+				vis[1000 + j*2 +1] = true;
+			else
+				break;
+
+			j++;
+			if (j >= 180) j -= 360;
+		}
+
+		from = to;
 	}
-	
-	// check everything is visited
-	
-	for (int i = 0; i < 720; i++){
-		cout << vis[i] << " ";
-		// cout << i << " " << vis[i] << " ";
-		/*if (!vis[i]){
-			cout << "no" << endl;
+
+	// check all degrees are visited
+	for (int i = 1000-180*2; i < 1000+180*2; i++){
+		if (!vis[i]){
+			cout << "no " << fixed << setprecision(1) << (double)(i-1000)/2 << endl;
 			return;
-		}*/
+		}
 	}
 	cout << "yes" << endl;
 	
-	// iterate each
-	
-		// fill array
 }
 
 int main(){
