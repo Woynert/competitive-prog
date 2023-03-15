@@ -31,3 +31,5 @@
 *.exe.stackdump
 *.out
 *.app
+
+.vscode
